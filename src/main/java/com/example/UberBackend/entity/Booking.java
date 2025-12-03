@@ -33,7 +33,7 @@ public class Booking extends BaseModel{
     @Column(nullable =false)
     private String pickupLocationLongitude;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String dropoffLocation;
 
     @Enumerated(EnumType.STRING)

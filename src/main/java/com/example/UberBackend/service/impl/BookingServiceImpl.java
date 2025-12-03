@@ -75,7 +75,7 @@ public class BookingServiceImpl implements BookingService {
 
         Booking newBooking = Booking.builder()
                 .passenger(passenger)
-                .pickupLocationLongitude(request.getPickupLocationLongitude())
+                .pickupLocationLatitude(request.getPickupLocationLatitude())
                 .pickupLocationLongitude(request.getPickupLocationLongitude())
                 .status(BookingStatus.PENDING)
                 .build();
