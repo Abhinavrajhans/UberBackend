@@ -18,7 +18,8 @@ public class BookingMapper {
         return Booking.builder()
                 .passenger(passenger)
                 .driver(driver)
-                .pickupLocation(request.getPickupLocation())
+                .pickupLocationLongitude(request.getPickupLocationLongitude())
+                .pickupLocationLatitude(request.getPickupLocationLatitude())
                 .dropoffLocation(request.getDropoffLocation())
                 .fare(request.getFare())
                 .status(status)
@@ -33,7 +34,7 @@ public class BookingMapper {
                 .passengerName(booking.getPassenger() != null ? booking.getPassenger().getName() : null)
                 .driverId(booking.getDriver() != null ? booking.getDriver().getId() : null)
                 .driverName(booking.getDriver() != null ? booking.getDriver().getName() : null)
-                .pickupLocation(booking.getPickupLocation())
+
                 .dropoffLocation(booking.getDropoffLocation())
                 .status(booking.getStatus())
                 .fare(booking.getFare())
@@ -48,7 +49,8 @@ public class BookingMapper {
     public void updateEntity(Booking booking, BookingRequest request, Passenger passenger, Driver driver) {
         booking.setPassenger(passenger);
         booking.setDriver(driver);
-        booking.setPickupLocation(request.getPickupLocation());
+        booking.setPickupLocationLatitude(request.getPickupLocationLatitude());
+        booking.setPickupLocationLongitude(request.getPickupLocationLongitude());
         booking.setDropoffLocation(request.getDropoffLocation());
         booking.setFare(request.getFare());
         booking.setScheduledPickupTime(request.getScheduledPickupTime());

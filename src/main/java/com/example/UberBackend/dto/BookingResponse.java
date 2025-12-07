@@ -1,6 +1,7 @@
 package com.example.UberBackend.dto;
 
 import com.example.UberBackend.entity.BookingStatus;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -17,7 +18,8 @@ public class BookingResponse {
     private String passengerName;
     private Long driverId;
     private String driverName;
-    private String pickupLocation;
+    private Double pickupLocationLatitude;
+    private Double pickupLocationLongitude;
     private String dropoffLocation;
     private BookingStatus status;
     private BigDecimal fare;
