@@ -37,7 +37,7 @@ public class GrpcClient {
     }
 
     public boolean notifyDriversForNewRide(String pickUpLocationLatitude , String pickUpLocationLongitude,
-                                           Integer bookingId , List<Integer> driverIds)
+                                           Long bookingId , List<Long> driverIds)
     {
         RideNotificationRequest request = RideNotificationRequest.newBuilder()
                 .setPickUpLocationLatitude(pickUpLocationLatitude)

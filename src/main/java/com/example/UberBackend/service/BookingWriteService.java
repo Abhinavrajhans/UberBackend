@@ -12,5 +12,6 @@ public interface BookingWriteService {
     BookingResponse create(BookingRequest request);
     BookingResponse update(Long id, BookingRequest request);
     BookingResponse updateStatus(Long id, BookingStatus status);
+    Boolean acceptRide(Long id,Long driverId);
     void deleteById(Long id);
 }

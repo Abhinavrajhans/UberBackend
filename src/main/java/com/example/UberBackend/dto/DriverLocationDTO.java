@@ -11,7 +11,7 @@ import lombok.*;
 @Builder
 public class DriverLocationDTO {
     @NotBlank(message = "driverId is required")
-    private Integer driverId;
+    private Long driverId;
 
     @NotNull(message="latitude is required")
     private Double latitude;
