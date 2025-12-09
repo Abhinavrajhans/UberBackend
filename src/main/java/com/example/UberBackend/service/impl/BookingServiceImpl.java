@@ -1,5 +1,6 @@
 package com.example.UberBackend.service.impl;
 
+import com.example.UberBackend.client.GrpcClient;
 import com.example.UberBackend.dto.BookingRequest;
 import com.example.UberBackend.dto.BookingResponse;
 import com.example.UberBackend.dto.DriverLocationDTO;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +34,7 @@ public class BookingServiceImpl implements BookingService {
     private final DriverRepository driverRepository;
     private final LocationService locationService;
     private final BookingMapper bookingMapper;
+    private final GrpcClient grpcClient;
 
     @Override
     @Transactional(readOnly = true)
@@ -70,26 +73,62 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingResponse create(BookingRequest request) {
+        // Validate and fetch passenger.
         Passenger passenger = passengerRepository.findById(request.getPassengerId())
                 .orElseThrow(() -> new IllegalArgumentException("Passenger not found with id: " + request.getPassengerId()));
 
-        Booking newBooking = Booking.builder()
+        //Handle driver assignment if provided
+        Driver driver = null;
+        BookingStatus bookingStatus = BookingStatus.PENDING;
+
+
+        if(request.getDriverId() != null) {
+            driver = driverRepository.findById(request.getDriverId())
+                    .orElseThrow(() -> new IllegalArgumentException("Driver not found with id: " + request.getDriverId()));
+
+            // Check if driver is avaialable
+            if(!driver.getIsAvailable()) {
+                throw new IllegalArgumentException("Driver with id "+ request.getDriverId() +" is not available");
+            }
+
+            //Assign driver and mark as unavailable
+            driver.setIsAvailable(false);
+            driverRepository.save(driver);
+            bookingStatus = BookingStatus.CONFIRMED;
+        }
+
+        // Convert latitude/longitude from Double to String
+        String pickupLat = request.getPickupLocationLatitude() != null ?
+                            request.getPickupLocationLatitude().toString() : null ;
+
+        String pickupLng = request.getPickupLocationLongitude() != null ?
+                            request.getPickupLocationLongitude().toString() : null;
+
+        // Set default fare if not provided
+        BigDecimal fare = request.getFare();
+        if(fare == null) {
+            fare = BigDecimal.ZERO;
+        }
+
+        // Create booking
+        Booking booking = Booking.builder()
                 .passenger(passenger)
-                .pickupLocationLatitude(request.getPickupLocationLatitude())
-                .pickupLocationLongitude(request.getPickupLocationLongitude())
-                .status(BookingStatus.PENDING)
+                .driver(driver)
+                .pickupLocationLongitude(pickupLat)
+                .pickupLocationLatitude(pickupLng)
+                .dropoffLocation(request.getDropoffLocation())
+                .status(bookingStatus)
+                .fare(fare)
+                .scheduledPickupTime(request.getScheduledPickupTime())
                 .build();
 
-        //Raise a booking request to nearby drivers
+        Booking savedBooking = bookingRepository.save(booking);
 
-        List<DriverLocationDTO> nearbyDrivers = locationService.getNearByDrivers(
-                request.getPickupLocationLatitude(),
-                request.getPickupLocationLongitude(),
-                10.0);
+        // Find the nearby drivers and then trigger an rpc to ubersocketservice to notify them
+        List<DriverLocationDTO> nearByDrivers = locationService.getNearByDrivers(Double.parseDouble(pickupLat),Double.parseDouble(pickupLng),10.0);
 
-
-
-        return bookingMapper.toResponse(bookingRepository.save(newBooking));
+        grpcClient.notifyDriversForNewRide(pickupLat,pickupLng,savedBooking.getId(),nearByDrivers.stream().map(DriverLocationDTO::getDriverId).collect(Collectors.toList()));
+        return bookingMapper.toResponse(savedBooking);
     }
 
     @Override

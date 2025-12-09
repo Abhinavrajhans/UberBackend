@@ -28,10 +28,10 @@ public class Booking extends BaseModel{
     private Driver driver;
 
     @Column(nullable = false)
-    private Double pickupLocationLatitude;
+    private String pickupLocationLatitude;
 
     @Column(nullable =false)
-    private Double pickupLocationLongitude;
+    private String pickupLocationLongitude;
 
     @Column(nullable = true)
     private String dropoffLocation;
