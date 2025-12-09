@@ -18,8 +18,8 @@ public class BookingMapper {
         return Booking.builder()
                 .passenger(passenger)
                 .driver(driver)
-                .pickupLocationLongitude(request.getPickupLocationLongitude())
-                .pickupLocationLatitude(request.getPickupLocationLatitude())
+                .pickupLocationLongitude( Double.toString(request.getPickupLocationLongitude()))
+                .pickupLocationLatitude(Double.toString(request.getPickupLocationLatitude()))
                 .dropoffLocation(request.getDropoffLocation())
                 .fare(request.getFare())
                 .status(status)
@@ -49,8 +49,8 @@ public class BookingMapper {
     public void updateEntity(Booking booking, BookingRequest request, Passenger passenger, Driver driver) {
         booking.setPassenger(passenger);
         booking.setDriver(driver);
-        booking.setPickupLocationLatitude(request.getPickupLocationLatitude());
-        booking.setPickupLocationLongitude(request.getPickupLocationLongitude());
+        booking.setPickupLocationLatitude(Double.toString(request.getPickupLocationLatitude()));
+        booking.setPickupLocationLongitude(Double.toString(request.getPickupLocationLongitude()));
         booking.setDropoffLocation(request.getDropoffLocation());
         booking.setFare(request.getFare());
         booking.setScheduledPickupTime(request.getScheduledPickupTime());

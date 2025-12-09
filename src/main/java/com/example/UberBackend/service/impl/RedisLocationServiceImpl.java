@@ -30,7 +30,7 @@ public class RedisLocationServiceImpl implements LocationService{
 
 
     @Override
-    public Boolean saveDriverLocation(Integer driverId, Double latitude, Double longitude) {
+    public Boolean saveDriverLocation(Long driverId, Double latitude, Double longitude) {
         GeoOperations<String, String> geoOperations = stringRedisTemplate.opsForGeo();
 
         // FIX: Point expects (longitude, latitude) - longitude first!
@@ -57,7 +57,7 @@ public class RedisLocationServiceImpl implements LocationService{
             Point point = geoOperations.position(DRIVER_GEO_OPS_KEY, result.getContent().getName()).getFirst();
 
             DriverLocationDTO driverLocation = DriverLocationDTO.builder()
-                    .driverId(Integer.parseInt(result.getContent().getName()))
+                    .driverId(Long.parseLong(result.getContent().getName()))
                     .latitude(point.getY())   // Y is latitude
                     .longitude(point.getX())  // X is longitude
                     .build();
